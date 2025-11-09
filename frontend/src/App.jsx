@@ -6,12 +6,15 @@ function App() {
   const [backendStatus, setBackendStatus] = useState("Checking...");
 
   useEffect(() => {
-    fetch("https://techbit-backend.onrender.com/api/health")
-      .then((r) => r.json())
-      .then((d) => setBackendStatus("Backend LIVE"))
-      .catch(() => setBackendStatus("Backend offline"));
-  }, []);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  fetch("https://vercel-demo-web-backend.onrender.com/api/health")
+    .then(r => {
+      if (!r.ok) throw new Error("not ok");
+      return r.json();
+    })
+    .then(() => setBackendStatus("Backend LIVE"))
+    .catch(() => setBackendStatus("Checking... (waking up)"));
+}, []);
+const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
 
   // Toggle dark mode
@@ -70,31 +73,36 @@ function App() {
                 )}
               </button>
               <button
-                onClick={async () => {
-                  try {
-                    const res = await fetch(
-                      // 
-                      "https://vercel-demo-web-backend.onrender.com/api/contact",
-                      {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          name: "Krishi",
-                          email: "krishi@example.com",
-                          message: "Hello from Vercel frontend!",
-                        }),
-                      }
-                    );
-                    const data = await res.json();
-                    alert("Backend says: " + JSON.stringify(data));
-                  } catch (e) {
-                    alert("Error: " + e.message);
-                  }
-                }}
-                className="mt-6 px-8 py-4 bg-green-600 text-white text-lg rounded-lg hover:bg-green-700 transition"
-              >
-                Test Backend Connection
-              </button>
+  onClick={async () => {
+    try {
+      const res = await fetch(
+        "https://vercel-demo-web-backend.onrender.com/api/contact",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: "Krishi",
+            email: "krishi@example.com",
+            message: "Hello from Vercel frontend!",
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Server error: ${res.status} – ${text.substring(0, 100)}`);
+      }
+
+      const data = await res.json();
+      alert("SUCCESS! Backend Response:\n\n" + JSON.stringify(data, null, 2));
+    } catch (e) {
+      alert("ERROR: " + e.message);
+    }
+  }}
+  className="mt-6 px-8 py-4 bg-green-600 text-white text-lg rounded-lg hover:bg-green-700 transition font-semibold"
+>
+  Test Backend Connection
+</button>
               <div className="text-sm text-gray-600 dark:text-gray-400">
   Status: <span className="font-bold text-green-600">{backendStatus}</span>
 </div>
