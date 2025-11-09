@@ -73,7 +73,8 @@ function App() {
                 onClick={async () => {
                   try {
                     const res = await fetch(
-                      "https://techbit-backend.onrender.com/api/contact",
+                      // 
+                      "https://vercel-demo-web-backend.onrender.com/api/contact",
                       {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
